@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>爬取新库</title>
+    <!-- 引入样式 -->
+    <!--    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">-->
+    <!-- 引入组件库 -->
+    <!--    <script src="https://unpkg.com/element-ui/lib/index.js"></script>-->
+    <!--    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14"></script>-->
+</head>
+<body style="margin: 0px">
+<div id="app" style="height: 100%">
+    <div th:replace="common/header::fragment-header"></div>
+    <el-container style="height: 100%; border: 1px solid #eee">
+
+
+        <el-container>
+            <div th:replace="common/sider::fragment-sider"></div>
+
+            <el-main class="el-main">
+                <div class="copyright" style="margin-top: 15%; font-size: 50px">
+                    感谢您的提议
+                </div>
+                <div  class="input--haruki">
+                    <el-input v-model="spi" placeholder="请输入要爬取的网页链接" style="width: 50%; margin-left: 22%; margin-top: 10px" type="text"></el-input>
+                    <el-button type="submit" class="btn" @click="submit">确定</el-button>
+                </div>
+
+                <div class="copyright" >
+                   © 2023 Primary Color. All rights reserved.
+                </div>
+            </el-main>
+        </el-container>
+    </el-container>
+</div>
+
+
+<style>
+    .el-header {
+        background-color: #B3C0D1;
+        color: #333;
+        line-height: 60px;
+    }
+
+    .el-aside {
+        color: #333;
+    }
+
+    .el-main {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: calc(100vh - 60px);
+    }
+
+    .btn:hover {
+        background-color: #0069d9;
+    }
+
+    .btn:active {
+        background-color: #0062cc;
+        box-shadow: none;
+        transform: translateY(2px);
+    }
+
+    /* 版权说明样式 */
+    .copyright {
+        text-align: center;
+        font-size: 14px;
+        color: #888;
+        margin-top: 20px;
+    }
+
+
+
+
+</style>
+
+<script src="https://cdn.bootcdn.net/ajax/libs/axios/1.2.5/axios.js"></script>
+<script src="../../js/vue.js"></script>
+<script src="../../element-ui/lib/index.js"></script>
+<link rel="stylesheet" href="../../element-ui/lib/theme-chalk/index.css">
+
+<script th:inline="javascript">
+
+    new Vue({
+        el: "#app",
+        mounted(){
+        },
+        methods: {
+            submit(){
+                const _this = this;
+                console.log(this.spi)
+                axios({
+                    method: "get",
+                    url: "/spider/new?url="+_this.spi,
+                    // data:  _this.input
+                }).then(function (data) {
+                    _this.$message({
+                        message: '发送成功',
+                        type: 'success'
+                    })
+                    // alert("发送成功")
+                })
+            },
+            cwe(){
+                window.location.href = '/cwe/index'
+            },
+            cveInfo(){
+                window.location.href = '/cve/index'
+            },
+            history(){
+                window.location.href = '/history/index'
+            },
+            jar(){
+                window.location.href = '/jarDetect/index'
+            },
+            spider(){
+                window.location.href = '/spider/index'
+            },
+            userManage(){
+                window.location.href = '/user/index'
+            },
+            userModify(){
+                window.location.href = '/user/userinfo'
+            },
+            loginOff(){
+                var _this = this
+                axios({
+                    method: "get",
+                    url: "/user/loginOff"
+                }).then(function (data) {
+                    console.log(data)
+                    window.location.href = '/login'
+                })
+            },
+        },
+        data() {
+            return {
+                spi: '',
+                activeIndex: '4'
+            };
+        }
+    })
+</script>
+
+</body>
+</html>
+

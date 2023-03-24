@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>任务列表</title>
+    <!-- 引入样式 -->
+    <!--    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">-->
+    <!-- 引入组件库 -->
+    <!--    <script src="https://unpkg.com/element-ui/lib/index.js"></script>-->
+    <!--    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14"></script>-->
+</head>
+<body>
+<div id="app">
+    <div th:replace="common/header::fragment-header"></div>
+    <el-container style="height: 90%; border: 1px solid #eee">
+        <el-container>
+            <div th:replace="common/sider::fragment-sider"></div>
+            <el-main>
+                <el-table
+                        :data="tableData"
+                        style="width: 100%">
+                    <el-table-column
+                            label="任务名"
+                            width="180">
+                        <template slot-scope="scope">
+                            <span style="margin-left: 10px">{{ scope.row.name }}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                            label="状态"
+                            width="180">
+                        <template slot-scope="scope">
+                            <span style="margin-left: 10px">{{ scope.row.status }}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="操作">
+                        <template slot-scope="scope">
+                            <el-button
+                                    size="mini"
+                                    :disabled="zt"
+                                    @click="handlezt(scope.$index, scope.row)">暂停</el-button>
+                            <el-button
+                                    size="mini"
+                                    :disabled="jx"
+                                    @click="handlejx(scope.$index, scope.row)">继续</el-button>
+                            <el-button
+                                    size="mini"
+                                    :disable="tz"
+                                    @click="handletz(scope.$index, scope.row)">停止</el-button>
+                            <el-button
+                                    size="mini"
+                                    :disabled="ks"
+                                    @click="handleks(scope.$index, scope.row)">重新开始</el-button>
+                            <el-button
+                                    size="mini"
+                                    type="danger"
+                                    @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </el-main>
+        </el-container>
+    </el-container>
+</div>
+
+<style>
+    .el-header {
+        background-color: #B3C0D1;
+        color: #333;
+        line-height: 60px;
+    }
+
+    .el-aside {
+        /*color: #333;*/
+    }
+
+    .el-table{
+        max-height: fit-content;
+        /*height*/
+    }
+</style>
+
+<script src="https://cdn.bootcdn.net/ajax/libs/axios/1.2.5/axios.js"></script>
+<script src="../../js/vue.js"></script>
+<script src="../../element-ui/lib/index.js"></script>
+<link rel="stylesheet" href="../../element-ui/lib/theme-chalk/index.css">
+
+<script th:inline="javascript">
+
+    new Vue({
+        el: "#app",
+        mounted(){
+            // const _this = this;
+            // axios({
+            //     method: "get",
+            //     url: "cwe/index?currentPage="+_this.currentPage+"&pageSize="+_this.pageSize
+            // }).then(function (data) {
+            //     // _this.tableData =
+            // })
+            // alert("!!!")
+            // this.select()
+        },
+        methods: {
+            handlezt(index, row){
+                this.jx=true
+                this.zt=false
+
+                alert("暂停成功")
+
+            },
+            handlejx(index, row){
+                alert("任务继续")
+
+            },
+            handletz(index, row){
+                alert("停止成功")
+            },
+            handleks(index, row){
+                alert("任务重新开始")
+            },
+            select(){
+                // const _this = this;
+                // axios({
+                //     method: "get",
+                //     url: "/cwe/index?currentPage="+_this.currentPage+"&pageSize="+_this.pageSize
+                // }).then(function (data) {
+                //     console.log(data)
+                //     _this.tableData = data.data.rows;
+                //     _this.totalCount = data.data.totalCount;
+                // })
+            },
+        },
+        data() {
+            return {
+                tableData: [],
+                zt: true,
+                jx: false,
+
+
+            };
+        }
+    })
+</script>
+</body>
+</html>

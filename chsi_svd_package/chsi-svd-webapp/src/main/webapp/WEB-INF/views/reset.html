@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>重置密码</title>
+    <!-- 引入样式 -->
+    <!--    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">-->
+    <!-- 引入组件库 -->
+    <!--    <script src="https://unpkg.com/element-ui/lib/index.js"></script>-->
+    <!--    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14"></script>-->
+</head>
+<body style="margin: 0px">
+<div id="app" style="height: 100%; margin: 0px">
+    <el-card style="margin-left: 35%; margin-top: 20%; width: 30%">
+        <el-radio-group v-model="way" @change="changeHandler" style="margin-top: 0; margin-bottom: 10px">
+            <el-radio-button label="1">手机号登录</el-radio-button>
+            <el-radio-button label="2">邮箱登录</el-radio-button>
+        </el-radio-group>
+        <el-form
+                :model="ruleForm"
+                :rules="rules"
+                ref="ruleForm"
+                label-width="100px"
+                class="demo-ruleForm">
+            <el-form-item label="手机号"  prop="phone" v-show="wayFlag">
+                <el-input v-model="ruleForm.phone"></el-input>
+            </el-form-item>
+            <el-form-item label="邮箱"  prop="email" v-show="!wayFlag">
+                <el-input v-model="ruleForm.email"></el-input>
+            </el-form-item>
+            <el-form-item label="密码"  prop="idNumber">
+                <el-input type="password" v-model="ruleForm.password"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="submitForm('ruleForm')">登录</el-button>
+                <el-button @click="findPass">忘记密码</el-button>
+            </el-form-item>
+        </el-form>
+    </el-card>
+
+</div>
+
+<style>
+    .el-header {
+        background-color: #B3C0D1;
+        color: #333;
+        line-height: 60px;
+    }
+
+    .el-aside {
+        /*color: #333;*/
+    }
+    .el-main {
+        height: calc(100vh - 60px);
+    }
+    .el-table{
+        max-height: fit-content;
+        /*height*/
+    }
+</style>
+
+<script src="https://cdn.bootcdn.net/ajax/libs/axios/1.2.5/axios.js"></script>
+<script src="../../js/vue.js"></script>
+<script src="../../element-ui/lib/index.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.1/echarts.min.js" integrity="sha512-OTbGFYPLe3jhy4bUwbB8nls0TFgz10kn0TLkmyA+l3FyivDs31zsXCjOis7YGDtE2Jsy0+fzW+3/OVoPVujPmQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="../../element-ui/lib/theme-chalk/index.css">
+
+<script th:inline="javascript">
+
+    new Vue({
+        el: "#app",
+        mounted(){
+            // this.select()
+        },
+        data() {
+            return {
+                way: 1,
+                ruleForm: {
+                    phone: "",
+                    email: "",
+                    password: "",
+                },
+                wayFlag: true,
+                rules: [],
+                rules1: {
+                    phone: [
+                        { required: true, message: "请输入手机号", trigger: "blur" },
+                        // 这个只能验证手机号
+                        // { pattern:/^0{0,1}(13[0-9]|15[7-9]|153|156|18[7-9])[0-9]{8}$/, message: "请输入合法手机号", trigger: "blur" }
+                        { pattern:/^((0\d{2,3}-\d{7,8})|(1[3584]\d{9}))$/, message: "请输入合法手机号/电话号", trigger: "blur" }
+                    ]
+                },
+                rules2: {
+                    email: [
+                        { required: true, message: "请输入邮箱", trigger: "blur" },
+                        { pattern:/^([0-9A-Za-z\-_\.]+)@([0-9a-z]+\.[a-z]{2,3}(\.[a-z]{2})?)$/g, message: "请输入正确的邮箱", trigger: "blur"}
+                    ],
+                }
+            };
+        },
+        methods: {
+            submitForm(formName) {
+                const _this = this;
+                if(this.wayFlag){
+                    this.rules = this.rules1
+                    this.$refs[formName].validate(valid => {
+                        if (valid) {
+                            axios({
+                                method: "post",
+                                url: "/user/loginPhone",
+                                data: _this.ruleForm
+                            }).then(function (data) {
+                                console.log(data)
+                                if (data.data=="success"){
+                                    window.location.href = '/cve/index'
+                                } else {
+                                    this.$message({
+                                        type:"error",
+                                        message:"手机号或密码错误"
+                                    });
+                                }
+                            })
+                        } else {
+                            console.log("error submit!!");
+                            return false;
+                        }
+                    })
+                } else {
+                    this.rules = this.rules2
+                    this.$refs[formName].validate(valid => {
+                        if (valid) {
+                            axios({
+                                method: "post",
+                                url: "/user/loginEmail",
+                                data: _this.ruleForm
+                            }).then(function (data) {
+                                if (data.data=="success"){
+                                    window.location.href = '/cve/index'
+                                } else {
+                                    this.$message({
+                                        type:"error",
+                                        message:"邮箱或密码错误"
+                                    });
+                                }
+                            })
+                        } else {
+                            console.log("error submit!!");
+                            return false;
+                        }
+                    })
+                }
+            },
+            changeHandler(){
+                if (this.way == 1){
+                    this.wayFlag = true
+                } else {
+                    this.wayFlag = false
+                }
+            }
+        },
+    })
+
+</script>
+</body>
+</html>

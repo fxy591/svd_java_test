@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>漏洞信息展示</title>
+    <!-- 引入样式 -->
+    <!--    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">-->
+    <!-- 引入组件库 -->
+    <!--    <script src="https://unpkg.com/element-ui/lib/index.js"></script>-->
+    <!--    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14"></script>-->
+</head>
+<body style="margin: 0px">
+<div id="app" style="height: 100%; margin: 0px">
+    <div th:replace="common/header::fragment-header"></div>
+    <!-- <el-header style="text-align: right; font-size: 12px"> -->
+    <!--     <span>Java开源组件漏洞监控系统</span> -->
+    <!--     <span th:text="${#httpSession.getAttribute('loginUser')?.getName() ?: 'unknown'}">王小虎</span> -->
+    <!--     <el-dropdown> -->
+    <!--         <i class="el-icon-setting" style="margin-right: 15px"></i> -->
+    <!--         <el-dropdown-menu slot="dropdown"> -->
+    <!--             <el-dropdown-item>修改信息</el-dropdown-item> -->
+    <!--             <el-dropdown-item>退出登录</el-dropdown-item> -->
+    <!--         </el-dropdown-menu> -->
+    <!--     </el-dropdown> -->
+    <!-- </el-header> -->
+    <el-container style="height: 90%; border: 1px solid #eee">
+        <el-container height="90%">
+            <div th:replace="common/sider::fragment-sider"></div>
+            <!-- <el-aside width="200px" style="background-color: rgb(238, 241, 246); height: 100%"> -->
+            <!--     <el-menu :default-active="1-1" style="background-color: rgb(238, 241, 246); "> -->
+            <!--         <el-submenu index="1"> -->
+            <!--             <template slot="title"><i class="el-icon-message"></i>漏洞信息</template> -->
+            <!--             <el-menu-item index="1-1" @click="cveInfo">图表展示</el-menu-item> -->
+            <!--             <el-menu-item index="1-2" @click="cwe">漏洞类型</el-menu-item> -->
+            <!--         </el-submenu> -->
+            <!--         <el-submenu index="2"> -->
+            <!--             <template slot="title"><i class="el-icon-menu"></i>项目检测</template> -->
+            <!--             <el-menu-item index="2-1">项目检测</el-menu-item> -->
+            <!--             <el-menu-item index="2-2">历史检测记录</el-menu-item> -->
+            <!--         </el-submenu> -->
+            <!--         <el-menu-item index="3"> -->
+            <!--             <template slot="title"><i class="el-icon-setting"></i>jar包检测</template> -->
+            <!--         </el-menu-item> -->
+            <!--         <el-menu-item index="4"> -->
+            <!--             <template slot="title"><i class="el-icon-setting"></i>爬取新库</template> -->
+            <!--         </el-menu-item> -->
+            <!--         <el-menu-item index="5"> -->
+            <!--             <template slot="title"><i class="el-icon-setting"></i>用户管理</template> -->
+            <!--         </el-menu-item> -->
+            <!--     </el-menu> -->
+            <!-- </el-aside> -->
+            <el-main class="el-main">
+                <el-row>
+                    <el-col :span="8">
+                        <div>
+                            <el-card>
+                                <div id="nist-chart" style="width: 500px; height: 400px"></div>
+                                <div id="cna-chart" style="width: 500px; height: 400px"></div>
+                            </el-card>
+                        </div>
+                    </el-col>
+                    <el-col :span="16">
+                        <div style="margin-left: 20px">
+                            <el-card>
+                                <el-table :data="tableData" height="800px" stripe>
+                                    <el-table-column type="expand">
+                                        <template slot-scope="props">
+                                            <el-form label-position="left" inline class="table-expand">
+                                                <el-form-item label="CVE编号">
+                                                    <el-link type="primary" :underline="false" :href="props.row.url"> {{ props.row.cveName }} </el-link>
+                                                </el-form-item>
+                                                <el-form-item label="类型">
+                                                    <span> {{ props.row.cweId }} </span>
+                                                </el-form-item>
+                                                <el-form-item label="Nist Score">
+                                                    <span> {{ props.row.nistScore }} </span>
+                                                </el-form-item>
+                                                <el-form-item label="Cna Score">
+                                                    <span> {{ props.row.cnaScore }} </span>
+                                                </el-form-item>
+                                                <el-form-item label="收录时间">
+                                                    <span> {{ props.row.publicTime }} </span>
+                                                </el-form-item>
+                                                <el-form-item label="更新时间">
+                                                    <span> {{ props.row.lastModified }} </span>
+                                                </el-form-item>
+                                                <el-form-item label="参考网址">
+                                                    <span> {{ props.row.referers }} </span>
+                                                </el-form-item>
+                                            </el-form>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column prop="cveName" label="CVE编号" width="140" align="center">
+                                    </el-table-column>
+                                    <el-table-column prop="nistScore" label="Nist Score" width="120" align="center">
+                                    </el-table-column>
+                                    <el-table-column prop="cnaScore" label="Cna Score" width="120" align="center">
+                                    </el-table-column>
+                                    <el-table-column prop="desc" label="描述" align="left">
+                                    </el-table-column>
+                                </el-table>
+                            </el-card>
+                        </div>
+                    </el-col>
+                </el-row>
+            </el-main>
+        </el-container>
+    </el-container>
+</div>
+
+<style>
+    .el-header {
+        background-color: #B3C0D1;
+        color: #333;
+        line-height: 60px;
+    }
+
+    .el-aside {
+        /*color: #333;*/
+    }
+    .el-main {
+        height: calc(100vh - 60px);
+    }
+    .el-table{
+        max-height: fit-content;
+        /*height*/
+    }
+</style>
+
+<script src="https://cdn.bootcdn.net/ajax/libs/axios/1.2.5/axios.js"></script>
+<script src="../../js/vue.js"></script>
+<script src="../../element-ui/lib/index.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.1/echarts.min.js" integrity="sha512-OTbGFYPLe3jhy4bUwbB8nls0TFgz10kn0TLkmyA+l3FyivDs31zsXCjOis7YGDtE2Jsy0+fzW+3/OVoPVujPmQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="../../element-ui/lib/theme-chalk/index.css">
+
+<script th:inline="javascript">
+
+    new Vue({
+        el: "#app",
+        mounted(){
+            // this.select()
+        },
+        methods: {
+            // select(){
+            //     const _this = this;
+            //     axios({
+            //         method: "get",
+            //         url: "/cwe/index?currentPage="+_this.currentPage+"&pageSize="+_this.pageSize
+            //     }).then(function (data) {
+            //         console.log(data)
+            //         _this.tableData = data.data.rows;
+            //         _this.totalCount = data.data.totalCount;
+            //     })
+            // },
+            cwe(){
+                window.location.href = '/cwe/index'
+            },
+            cveInfo(){
+                window.location.href = '/cve/index'
+            },
+            detect(){
+                window.location.href = '/detect/index'
+            },
+            history(){
+                window.location.href = '/history/index'
+            },
+            jar(){
+                window.location.href = '/jarDetect/index'
+            },
+            spider(){
+                window.location.href = '/spider/index'
+            },
+            userManage(){
+                window.location.href = '/user/index'
+            },
+            userModify(){
+                window.location.href = '/user/userinfo'
+            },
+            loginOff(){
+                var _this = this
+                axios({
+                    method: "get",
+                    url: "/user/loginOff"
+                }).then(function (data) {
+                    console.log(data)
+                    window.location.href = '/login'
+                })
+            },
+
+        },
+        data() {
+            return {
+                tableData: [[${cves}]],
+                m:'',
+                user: [],
+                activeIndex: '1-1',
+            };
+        }
+    })
+
+    var nistPieData = [[${nistPieData}]];
+
+    var nistChart = echarts.init(document.getElementById('nist-chart'));
+    var option = {
+        title: {
+            text: '漏洞风险等级Nist分布图',
+            left: 'center'
+        },
+        tooltip: {
+            trigger: 'item',
+            formatter: '{a} <br/>{b} : {c} ({d}%)'
+        },
+        legend: {
+            orient: 'vertical',
+            left: 'left',
+            data: ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL', 'UNDEFINED']
+        },
+        series: [
+            {
+                type: 'pie',
+                radius: '55%',
+                center: ['50%', '60%'],
+                data: nistPieData,
+                roseType: 'area',
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                }
+            }
+        ]
+    };
+    nistChart.setOption(option);
+
+    var cnaPieData = [[${cnaPieData}]];
+
+    var cnaChart = echarts.init(document.getElementById('cna-chart'));
+    var option = {
+        title: {
+            text: '漏洞风险等级CNA分布图',
+            left: 'center'
+        },
+        tooltip: {
+            trigger: 'item',
+            formatter: '{a} <br/>{b} : {c} ({d}%)'
+        },
+        legend: {
+            orient: 'vertical',
+            left: 'left',
+            data: ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL', 'UNDEFINED']
+        },
+        series: [
+            {
+                type: 'pie',
+                radius: '55%',
+                center: ['50%', '60%'],
+                data: cnaPieData,
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                }
+            }
+        ]
+    };
+    cnaChart.setOption(option);
+
+</script>
+</body>
+</html>

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>jar包检测</title>
+    <!-- 引入样式 -->
+    <!--    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">-->
+    <!-- 引入组件库 -->
+    <!--    <script src="https://unpkg.com/element-ui/lib/index.js"></script>-->
+    <!--    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14"></script>-->
+</head>
+<body style="margin: 0px">
+<div id="app" style="height: 100%; margin: 0px">
+    <div th:replace="common/header::fragment-header"></div>
+    <el-container style="height: 100%; border: 1px solid #eee">
+        <!-- <el-header style="text-align: right; font-size: 12px"> -->
+        <!--     <span>Java开源组件漏洞监控系统</span> -->
+        <!--     <span>王小虎</span> -->
+        <!--     <el-dropdown> -->
+        <!--         <i class="el-icon-setting" style="margin-right: 15px"></i> -->
+        <!--         <el-dropdown-menu slot="dropdown"> -->
+        <!--             <el-dropdown-item>修改信息</el-dropdown-item> -->
+        <!--             <el-dropdown-item>退出登录</el-dropdown-item> -->
+        <!--         </el-dropdown-menu> -->
+        <!--     </el-dropdown> -->
+        <!-- </el-header> -->
+
+        <el-container>
+            <div th:replace="common/sider::fragment-sider"></div>
+            <!-- <el-aside width="200px" style="background-color: rgb(238, 241, 246); "> -->
+            <!--     <el-menu :default-active="3" style="background-color: rgb(238, 241, 246); "> -->
+            <!--         <el-submenu index="1"> -->
+            <!--             <template slot="title"><i class="el-icon-message"></i>漏洞信息</template> -->
+            <!--         </el-submenu> -->
+            <!--         <el-submenu index="2"> -->
+            <!--             <template slot="title"><i class="el-icon-menu"></i>项目检测</template> -->
+            <!--             <el-menu-item-group> -->
+            <!--                 <template slot="title">项目检测</template> -->
+            <!--             </el-menu-item-group> -->
+            <!--             <el-menu-item index="2-3">任务列表</el-menu-item> -->
+            <!--             <el-menu-item index="2-4">历史检测记录</el-menu-item> -->
+            <!--         </el-submenu> -->
+            <!--         <el-submenu index="3"> -->
+            <!--             <template slot="title"><i class="el-icon-setting"></i>jar包检测</template> -->
+            <!--         </el-submenu> -->
+            <!--         <el-submenu index="4"> -->
+            <!--             <template slot="title"><i class="el-icon-setting"></i>爬取新库</template> -->
+            <!--         </el-submenu> -->
+            <!--         <el-submenu index="5"> -->
+            <!--             <template slot="title"><i class="el-icon-setting"></i>情报订阅</template> -->
+            <!--         </el-submenu> -->
+            <!--         <el-submenu index="6"> -->
+            <!--             <template slot="title"><i class="el-icon-setting"></i>用户管理</template> -->
+            <!--         </el-submenu> -->
+            <!--     </el-menu> -->
+            <!-- </el-aside> -->
+            <el-main class="el-main">
+                <el-form :model="jarForm" status-icon label-width="150px" class="jarForm" ref="jarForm" :inline="true">
+                    <el-form-item>
+                        <el-button type="primary" @click="submitForm" style="margin-left: 150px; margin-right: 100px">提交</el-button>
+                    </el-form-item>
+                    <el-form-item label="GroupID" prop="groupId">
+                        <!-- <el-input v-model="jarForm.groupId" autocomplete="off" th:placeholder="${component.getGroupId()}"></el-input> -->
+                        <el-input v-model="jarForm.groupId" autocomplete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="ArtifactID" prop="artifactId">
+                        <!-- <el-input v-model="jarForm.artifactId" autocomplete="off" th:placeholder="${component.getArtifactId()}"></el-input> -->
+                        <el-input v-model="jarForm.artifactId" autocomplete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="Version" prop="version">
+                        <!-- <el-input v-model="jarForm.version" th:placeholder="${component.getVersion()}"></el-input> -->
+                        <el-input v-model="jarForm.version"></el-input>
+                    </el-form-item>
+                    <!-- <el-form-item> -->
+                    <!--     <el-button @click="resetForm('jarForm')">重置</el-button> -->
+                    <!-- </el-form-item> -->
+                </el-form>
+                <br>
+
+                <el-table :data="tableData" height="85%" stripe>
+                    <el-table-column type="expand">
+                        <template slot-scope="props">
+                            <el-form label-position="left" inline class="table-expand">
+                                <el-form-item label="CVE编号">
+                                    <el-link type="primary" :underline="false" :href="props.row.url"> {{ props.row.cveName }} </el-link>
+                                </el-form-item>
+                                <el-form-item label="类型">
+                                    <span> {{ props.row.cweId }} </span>
+                                </el-form-item>
+                                <el-form-item label="Nist Score">
+                                    <span> {{ props.row.nistScore }} </span>
+                                </el-form-item>
+                                <el-form-item label="Cna Score">
+                                    <span> {{ props.row.cnaScore }} </span>
+                                </el-form-item>
+                                <el-form-item label="收录时间">
+                                    <span> {{ props.row.publicTime }} </span>
+                                </el-form-item>
+                                <el-form-item label="更新时间">
+                                    <span> {{ props.row.lastModified }} </span>
+                                </el-form-item>
+                                <!-- <el-form-item label="描述"> -->
+                                <!--     <span> {{ props.row.desc }} </span> -->
+                                <!-- </el-form-item> -->
+                                <el-form-item label="参考网址">
+                                    <span> {{ props.row.referers }} </span>
+                                </el-form-item>
+                                <!-- <el-form-item label="类型"> -->
+                                <!--     <span th:text="${{component.getCveList().get(1).getCweId()}}">测试</span> -->
+                                <!-- </el-form-item> -->
+                                <!-- <el-form-item label="类型"> -->
+                                <!--     <span th:text="${{component.getCveList().get(1).getCweId()}}">测试</span> -->
+                                <!-- </el-form-item> -->
+                                <!-- <el-form-item label="类型"> -->
+                                <!--     <span th:text="${{component.getCveList().get(1).getCweId()}}">测试</span> -->
+                                <!-- </el-form-item> -->
+                                <!-- <el-form-item label="类型"> -->
+                                <!--     <span th:text="${{component.getCveList().get(1).getCweId()}}">测试</span> -->
+                                <!-- </el-form-item> -->
+                                <!-- <el-form-item label="类型"> -->
+                                <!--     <span th:text="${{component.getCveList().get(1).getCweId()}}">测试</span> -->
+                                <!-- </el-form-item> -->
+                                <!-- <el-form-item label="类型"> -->
+                                <!--     <span th:text="${{component.getCveList().get(1).getCweId()}}">测试</span> -->
+                                <!-- </el-form-item> -->
+                            </el-form>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="cveName" label="CVE编号" width="140" align="center">
+                    </el-table-column>
+                    <!-- <el-table-column prop="cweId" label="类型" width="240" align="center"> -->
+                    <!-- </el-table-column> -->
+                    <el-table-column prop="nistScore" label="Nist Score" width="120" align="center">
+                    </el-table-column>
+                    <el-table-column prop="cnaScore" label="Cna Score" width="120" align="center">
+                    </el-table-column>
+                    <!-- <el-table-column prop="publicTime" label="收录时间" width="120" align="center"> -->
+                    <!-- </el-table-column> -->
+                    <!-- <el-table-column prop="modified" label="更新时间" width="120" align="center"> -->
+                    <!-- </el-table-column> -->
+                    <el-table-column prop="desc" label="描述" align="left">
+                    </el-table-column>
+                </el-table>
+            </el-main>
+        </el-container>
+    </el-container>
+   <!-- <div> -->
+   <!--     <p th:text="${message}">p> -->
+   <!-- </div> -->
+</div>
+
+
+<style>
+    .el-header {
+        background-color: #B3C0D1;
+        color: #333;
+        line-height: 60px;
+    }
+    .el-main {
+        height: calc(100vh - 60px);
+    }
+    .el-aside {
+        /*color: #333;*/
+    }
+
+    .table-expand {
+        font-size: 0;
+    }
+    .table-expand label {
+        width: 90px;
+        color: #99a9bf;
+    }
+    .table-expand .el-form-item {
+        margin-right: 0;
+        margin-bottom: 0;
+        width: 50%;
+    }
+</style>
+
+<script src="https://cdn.bootcdn.net/ajax/libs/axios/1.2.5/axios.js"></script>
+<script src="../../js/vue.js"></script>
+<script src="../../element-ui/lib/index.js"></script>
+<link rel="stylesheet" href="../../element-ui/lib/theme-chalk/index.css">
+
+<script th:inline="javascript">
+
+    new Vue({
+        el: "#app",
+        mounted(){
+            // alert("!!!")
+        },
+        methods: {
+            submitForm() {
+                var _this = this;
+                // _this.displayTags.loading = true;
+                // _this.tableData = [];
+                // console.log(_this.jar)
+                _jarData = {
+                    groupId: _this.jarForm.groupId,
+                    artifactId: _this.jarForm.artifactId,
+                    version: _this.jarForm.version
+                }
+                axios({
+                    method: "post",
+                    url: "/jarDetect/jarDetect",
+                    data: _jarData
+                }).then(function (data) {
+                    // alert("111")
+                    console.log(data)
+                    _this.tableData = data.data.cveList
+                })
+
+                // api.syncAjax('get', 'jarDetect1', { params: _this.jarForm })
+                //     .then(function (res) {
+                //         alert("!!!")
+                //     })
+            },
+            resetForm(formName) {
+                this.$refs[formName].resetFields();
+            },
+            cwe(){
+                window.location.href = '/cwe/index'
+            },
+            cveInfo(){
+                window.location.href = '/cve/index'
+            },
+            history(){
+                window.location.href = '/history/index'
+            },
+            jar(){
+                window.location.href = '/jarDetect/index'
+            },
+            spider(){
+                window.location.href = '/spider/index'
+            },
+            userManage(){
+                window.location.href = '/user/index'
+            },
+            userModify(){
+                window.location.href = '/user/userinfo'
+            },
+            loginOff(){
+                var _this = this
+                axios({
+                    method: "get",
+                    url: "/user/loginOff"
+                }).then(function (data) {
+                    console.log(data)
+                    window.location.href = '/login'
+                })
+            },
+        },
+        data() {
+            return {
+                jarForm: [[${component}]],
+
+                // tableData: {
+                //     cve: [[${component.getCveList()}]],
+                //     cwe: '',
+                //     score: '',
+                //     publicTime: '',
+                //     modified: '',
+                //     desc: ''
+                // },
+                tableData: [[${component.getCveList()}]],
+                activeIndex: '3',
+                // jar: {
+                //     groupId: this.jarForm.groupId,
+                //     artifactId: this.jarForm.artifactId,
+                //     version: this.jarForm.Version,
+                // }
+            };
+        }
+    })
+</script>
+
+</body>
+</html>

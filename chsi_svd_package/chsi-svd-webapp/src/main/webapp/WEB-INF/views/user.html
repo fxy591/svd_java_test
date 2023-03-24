@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用户管理</title>
+    <!-- 引入样式 -->
+    <!--    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">-->
+    <!-- 引入组件库 -->
+    <!--    <script src="https://unpkg.com/element-ui/lib/index.js"></script>-->
+    <!--    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14"></script>-->
+</head>
+<body style="margin: 0px">
+<div id="app" style="height: 100%">
+    <div th:replace="common/header::fragment-header"></div>
+    <el-container style="height: 100%; border: 1px solid #eee">
+
+
+        <el-container>
+            <div th:replace="common/sider::fragment-sider"></div>
+
+            <el-main class="el-main">
+                <div style="width: 100%">
+                    <el-button @click="add" type="text" icon="CirclePlus">添加</el-button>
+                    <el-button @click="deleteAll" type="text" icon="CirclePlus">删除</el-button>
+                    <el-button @click="select" type="text" icon="CirclePlus">搜索</el-button>
+                    <el-button @click="resetForm('formData')" type="text" icon="CirclePlus">重置</el-button>
+                </div>
+                <br>
+                <div>
+                    <el-form :model="formData" :inline="true" status-icon label-width="100px" class="formData" ref="formData">
+                        <el-form-item label="名字" prop="name" width="500px">
+                            <el-input v-model="formData.name" width="100px"></el-input>
+                        </el-form-item>
+                        <el-form-item label="手机" prop="phone">
+                            <el-input v-model="formData.phone" width="400px"></el-input>
+                            <!-- <el-input v-model="jarForm.artifactId" autocomplete="off"></el-input> -->
+                        </el-form-item>
+                        <el-form-item label="邮箱" prop="email">
+                            <el-input v-model="formData.email" width="100px"></el-input>
+                            <!-- <el-input v-model="jarForm.version"></el-input> -->
+                        </el-form-item>
+                        <el-form-item label="部门" prop="depart">
+                            <el-input v-model="formData.depart" width="100px"></el-input>
+                            <!-- <el-input v-model="jarForm.version"></el-input> -->
+                        </el-form-item>
+                        <el-form-item label="职位" prop="position">
+                            <el-input v-model="formData.position" width="100px"></el-input>
+                            <!-- <el-input v-model="jarForm.version"></el-input> -->
+                        </el-form-item>
+                        <!-- <el-button @click="resetForm('formData')" type="text" icon="CirclePlus">重置</el-button> -->
+                    </el-form>
+                </div>
+
+                <el-table :data="tableData" ref="multipleTable" @selection-change="handleSelectionChange">
+                    <el-table-column
+                            type="selection"
+                            width="55">
+                    </el-table-column>
+                    <el-table-column prop="id" label="序号" width="50" type="index" align="center"
+                                     :index="index=>index+1">
+                    </el-table-column>
+                    <el-table-column prop="name" label="姓名" align="center">
+                        <template #default="scope">
+                            <span v-show="!scope.row.editFlag">{{scope.row.name}}</span>
+                            <el-input v-show="scope.row.editFlag"
+                                      v-model="scope.row.name">
+                            </el-input>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="phone" label="手机" align="center">
+                        <template #default="scope">
+                            <span v-show="!scope.row.editFlag">{{scope.row.phone}}</span>
+                            <el-input v-show="scope.row.editFlag"
+                                      v-model="scope.row.phone">
+                            </el-input>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="email" label="邮箱" width="300" align="center">
+                        <template #default="scope">
+                            <span v-show="!scope.row.editFlag">{{scope.row.email}}</span>
+                            <el-input v-show="scope.row.editFlag"
+                                      v-model="scope.row.email">
+                            </el-input>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="depart" label="部门" align="center">
+                        <template #default="scope">
+                            <span v-show="!scope.row.editFlag">{{scope.row.depart}}</span>
+                            <el-input v-show="scope.row.editFlag"
+                                      v-model="scope.row.depart">
+                            </el-input>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="position" label="职位" th:align="center">
+                        <template #default="scope">
+                            <span v-show="!scope.row.editFlag">{{scope.row.position}}</span>
+                            <el-input v-show="scope.row.editFlag"
+                                      v-model="scope.row.position">
+                            </el-input>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="role" label="角色" th:align="center">
+                        <template #default="scope">
+                            <span v-show="!scope.row.editFlag" v-if>{{scope.row.role}}</span>
+                            <el-input v-show="scope.row.editFlag"
+                                      v-model="scope.row.role">
+                            </el-input>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="操作" width="120" align="center">
+                        <template #default="scope">
+                            <div style="display: flex;">
+                                <el-button size="small"
+                                           type="text"
+                                           icon="CircleCheck"
+                                           v-show="scope.row.editFlag"
+                                           @click="submit(scope.row,scope.$index)">确定
+                                </el-button>
+                                <el-button size="small"
+                                           type="text"
+                                           icon="CircleClose"
+                                           v-show="scope.row.editFlag"
+                                           @click="cancel(scope.row,scope.$index)">取消
+                                </el-button>
+                                <el-button size="small"
+                                           icon="Edit"
+                                           type="text"
+                                           v-show="!scope.row.editFlag"
+                                           @click="edit(scope.row)"> 编辑
+                                </el-button>
+                                <el-button size="small"
+                                           icon="Delete"
+                                           type="text"
+                                           v-show="!scope.row.editFlag"
+                                           @click="del(scope.row,scope.$index)">删除
+                                </el-button>
+                            </div>
+                        </template>
+                    </el-table-column>
+                </el-table>
+                <br>
+                <el-pagination
+                        @size-change="handleSizeChange"
+                        @current-change="handleCurrentChange"
+                        :current-page="currentPage"
+                        :page-sizes="[15, 20, 25, 30]"
+                        :page-size="pageSize"
+                        layout="total, sizes, prev, pager, next, jumper"
+                        :total="totalCount">
+                </el-pagination>
+
+                <el-dialog title="添加用户" :visible.sync="dialogFormVisible">
+                    <el-form :model="form">
+                        <el-form-item label="姓名" :label-width="formLabelWidth" prop="name">
+                            <el-input v-model="form.name" autocomplete="off"></el-input>
+                        </el-form-item>
+                        <el-form-item label="手机" :label-width="formLabelWidth" prop="phone">
+                            <el-input v-model="form.phone" autocomplete="off"></el-input>
+                        </el-form-item>
+                        <el-form-item label="邮箱" :label-width="formLabelWidth" prop="email">
+                            <el-input v-model="form.email" autocomplete="off"></el-input>
+                        </el-form-item>
+                        <el-form-item label="部门" :label-width="formLabelWidth" prop="depart">
+                            <el-input v-model="form.depart" autocomplete="off"></el-input>
+                        </el-form-item>
+                        <el-form-item label="职位" :label-width="formLabelWidth" prop="position">
+                            <el-input v-model="form.position" autocomplete="off"></el-input>
+                        </el-form-item>
+                        <el-form-item label="角色" :label-width="formLabelWidth" prop="role">
+                            <el-select v-model="form.role" placeholder="请选择角色">
+                                <el-option label="普通员工" value="1"></el-option>
+                                <el-option label="部门管理员" value="2"></el-option>
+                                <el-option label="超级管理员" value="3"></el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-form>
+                    <div slot="footer" class="dialog-footer">
+                        <el-button @click="dialogFormVisible = false">取 消</el-button>
+                        <el-button type="primary" @click="addSubmit">确 定</el-button>
+                    </div>
+                </el-dialog>
+            </el-main>
+        </el-container>
+    </el-container>
+</div>
+
+
+<style>
+    .el-header {
+        background-color: #B3C0D1;
+        color: #333;
+        line-height: 60px;
+    }
+
+    .el-aside {
+        color: #333;
+    }
+
+    .el-main {
+        height: calc(100vh - 60px);
+    }
+</style>
+
+<script src="https://cdn.bootcdn.net/ajax/libs/axios/1.2.5/axios.js"></script>
+<script src="../../js/vue.js"></script>
+<script src="../../element-ui/lib/index.js"></script>
+<link rel="stylesheet" href="../../element-ui/lib/theme-chalk/index.css">
+
+<script th:inline="javascript">
+
+    new Vue({
+        el: "#app",
+        mounted(){
+            // alert("!!!")
+            this.selectAll()
+
+        },
+        methods: {
+            add(){
+                this.dialogFormVisible = true
+            },
+            addSubmit(){
+                console.log(this.form)
+                const _this = this;
+                axios({
+                    method: "post",
+                    url: "/user/add",
+                    data: _this.form
+                }).then(function (data) {
+                    console.log(data)
+                    _this.selectAll()
+                })
+                this.dialogFormVisible = false
+            },
+            handleSelectionChange(val) {
+                this.multipleSelection = val;
+            },
+            deleteAll(){
+                const _this = this;
+                console.log(_this.multipleSelection)
+                this.$confirm('此操作将删除该数据，是否继续？', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    axios({
+                        method: "post",
+                        url: "/user/deleteAll",
+
+                        // data: Object.fromEntries(_this.users)
+                        data: {users: _this.multipleSelection}
+                    }).then(function (data) {
+                        if(data.data == "success"){
+                            console.log(data)
+                            _this.selectAll()
+                            _this.$message({
+                                message: '删除成功',
+                                type: 'success'
+                            })
+                        } else {
+                            _this.$message({
+                                message: '删除失败',
+                                type: 'info'
+                            })
+                        }
+                    })
+                }).catch(() => {
+                    _this.$message({
+                        message: '取消删除',
+                        type: 'info'
+                    })
+                })
+
+            },
+            resetForm(formName) {
+                this.$refs[formName].resetFields();
+            },
+            handleSizeChange(val) {
+                this.pageSize = val
+                this.select()
+                // console.log(`每页 ${val} 条`);
+            },
+            handleCurrentChange(val) {
+                this.currentPage = val
+                this.select()
+                // console.log(`当前页: ${val}`);
+            },
+            selectAll(){
+                var _this = this
+                axios({
+                    method: "get",
+                    url: "/user/query?currentPage="+_this.currentPage+"&pageSize="+_this.pageSize,
+                    // data: _this.formData
+                }).then(function (data) {
+                    console.log(data)
+                    _this.tableData = data.data.rows
+                    _this.totalCount = data.data.totalCount;
+                })
+            },
+            select(){
+                const _this = this;
+                console.log(this.formData)
+                sendData = {
+                    name: this.formData.name,
+                    phone: this.formData.phone,
+                    email: this.formData.email,
+                    depart: this.formData.depart,
+                    position: this.formData.position,
+                    currentPage: this.currentPage,
+                    pageSize: this.pageSize
+                }
+                axios({
+                    method: "post",
+                    url: "/user/query1",
+                    data: sendData
+                }).then(function (data) {
+                    console.log(data)
+                    _this.tableData = data.data.rows;
+                    _this.totalCount = data.data.totalCount;
+                })
+                // }
+
+            },
+            edit(row){
+                this.originalData = JSON.parse(JSON.stringify(this.tableData))
+                row.editFlag = !row.editFlag;
+            },
+            submit(row,index){
+                var _this = this
+                console.log(this.tableData[index])
+                axios({
+                    method: "post",
+                    url: "/user/update",
+                    data: _this.tableData[index]
+                }).then(function (data) {
+                    console.log(data)
+                })
+                row.editFlag = !row.editFlag
+            },
+            cancel(row,index){
+                this.tableData[index] = this.originalData[index]
+                row.editFlag = !row.editFlag
+            },
+            del(row,index){
+                var _this = this
+                axios({
+                    method: "post",
+                    url: "/user/delete",
+                    data: _this.tableData[index]
+                }).then(function (data) {
+                    console.log(data)
+                })
+                row.editFlag = !row.editFlag
+            },
+            cwe(){
+                window.location.href = '/cwe/index'
+            },
+            cveInfo(){
+                window.location.href = '/cve/index'
+            },
+            history(){
+                window.location.href = '/history/index'
+            },
+            jar(){
+                window.location.href = '/jarDetect/index'
+            },
+            spider(){
+                window.location.href = '/spider/index'
+            },
+            userManage(){
+                window.location.href = '/user/index'
+            },
+            userModify(){
+                window.location.href = '/user/userinfo'
+            },
+            loginOff(){
+                var _this = this
+                axios({
+                    method: "get",
+                    url: "/user/loginOff"
+                }).then(function (data) {
+                    console.log(data)
+                    window.location.href = '/login'
+                })
+            },
+        },
+        data() {
+            return {
+                dialogFormVisible: false,
+                // tableData: {
+                //     id: '',
+                //     name: '',
+                //     phone: '',
+                //     email: '',
+                //     depart: '',
+                //     position: '',
+                //     role: '',
+                //     editFlag: false,
+                //     isSubmit: false, // 是否点击确定标识
+                // },
+                tableData: [],
+                originalData: [],
+                formLabelWidth: '120px',
+                // form: {
+                //     name: '',
+                //     phone: '',
+                //     email: '',
+                //     depart: '',
+                //     position: '',
+                //     role: '',
+                // },
+                form: {},
+                multipleSelection: [],
+                // formData: {
+                //     name: '',
+                //     phone: '',
+                //     email: '',
+                //     depart: '',
+                //     position: ''
+                // },
+                formData:[],
+                currentPage: 1,
+                pageSize: 15,
+                totalCount: 100,
+                activeIndex: '5'
+            };
+        }
+    })
+</script>
+
+</body>
+</html>

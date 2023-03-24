@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <name>Chsi application</name>
+  <url>http://www.chsi.com.cn/</url>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.chsi</groupId>
+    <version>1.0.2</version>
+    <artifactId>chsi-project</artifactId>
+  </parent>
+
+  <groupId>com.chsi</groupId>
+  <version>1.0-SNAPSHOT</version>
+  <artifactId>chsi_svd_package</artifactId>
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>chsi-svd</module>
+    <module>chsi-svd-webapp</module>
+  </modules>
+
+  <scm>
+    <connection>scm:svn:https://svn.chsi.com.cn/svn/repos/chsicommunity/kxcjd/trunk</connection>
+    <developerConnection>scm:svn:https://svn.chsi.com.cn/svn/repos/chsicommunity/kxcjd/trunk</developerConnection>
+  </scm>
+  <repositories>
+    <repository>
+      <id>chsi</id>
+      <name>Chsi Repository</name>
+      <layout>default</layout>
+      <url>http://maven.chsi.com.cn/maven2</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
+  <build>
+    <sourceDirectory>src/main/java</sourceDirectory>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+          <encoding>UTF-8</encoding>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.0.2</version>
+        <configuration>
+          <encoding>UTF-8</encoding>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-eclipse-plugin</artifactId>
+        <version>2.7</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-scm-plugin</artifactId>
+        <version>1.8</version>
+        <configuration>
+          <connectionType>developerConnection</connectionType>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.3.2</version>
+        <configuration>
+          <tagBase>https://svn.chsi.com.cn/svn/repos/chsicommunity/kxcjd/tags</tagBase>
+        </configuration>
+      </plugin>
+    </plugins>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-ftp</artifactId>
+        <version>2.2</version>
+      </extension>
+    </extensions>
+  </build>
+
+  <properties>
+    <!-- maven plugin's version -->
+    <chsi-project.version>1.0.2</chsi-project.version>
+    <spring-core.version>5.3.8</spring-core.version>
+    <groovy.version>3.0.3</groovy.version>
+    <gson.version>2.3</gson.version>
+    <jackson-mapper-asl.version>1.9.9.redhat-7</jackson-mapper-asl.version>
+    <!-- 覆盖父pom的chsi-account-client.version值 -->
+    <jackson-core.version>2.0.6</jackson-core.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-core</artifactId>
+      <version>${spring-core.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.8.2-redhat-1</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>chsi-cachecfg-remote</artifactId>
+          <groupId>com.chsi</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>chsi-commonutil-client</artifactId>
+          <groupId>com.chsi</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>chsi-encrypt-client</artifactId>
+          <groupId>com.chsi</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>chsi-memcachedclient</artifactId>
+          <groupId>com.chsi</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+      <version>3.0.9-redhat-1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy</artifactId>
+      <version>${groovy.version}</version>
+    </dependency>
+  </dependencies>
+</project>

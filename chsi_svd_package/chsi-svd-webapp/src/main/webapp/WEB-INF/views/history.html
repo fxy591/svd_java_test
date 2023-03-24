@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>历史检测记录</title>
+    <!-- 引入样式 -->
+    <!--    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">-->
+    <!-- 引入组件库 -->
+    <!--    <script src="https://unpkg.com/element-ui/lib/index.js"></script>-->
+    <!--    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14"></script>-->
+</head>
+<body style="margin: 0px">
+<div id="app" style="height: 100%; margin: 0px">
+    <div th:replace="common/header::fragment-header"></div>
+    <el-container style="height: 90%; border: 1px solid #eee">
+        <el-container height="90%">
+            <div th:replace="common/sider::fragment-sider"></div>
+            <el-main class="el-main">
+
+                <el-table :data="tableData" height="800px">
+                    <el-table-column prop="projectID" label="项目名" align="center">
+                    </el-table-column>
+                    <el-table-column prop="detectTime" label="检测时间" align="center">
+                    </el-table-column>
+                    <el-table-column prop="cveNum" label="漏洞数" align="center">
+                    </el-table-column>
+                    <el-table-column prop="highNum" label="高危漏洞数" align="center">
+                    </el-table-column>
+                    <el-table-column prop="value" label="监控频率" align="center">
+                        <template #default="scope">
+                            <el-select v-model="scope.row.value" placeholder="请选择">
+                                <el-option label="1小时" value="1"></el-option>
+                                <el-option label="6小时" value="2"></el-option>
+                                <el-option label="12小时" value="3"></el-option>
+                                <el-option label="1天" value="4"></el-option>
+                                <el-option label="2天" value="5"></el-option>
+                                <el-option label="1周" value="6"></el-option>
+                                <el-option label="停止监控" value="0"></el-option>
+                            </el-select>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="noticeValue" label="告警方式"  align="center">
+                        <template #default="scope">
+                            <el-select v-model="scope.row.noticeValue" placeholder="请选择">
+                                <el-option label="邮箱" value="1"></el-option>
+                                <el-option label="手机" value="2"></el-option>
+                                <el-option label="停止告警" value="0"></el-option>
+                            </el-select>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="newValue" label="情报订阅"  align="center">
+                        <template #default="scope">
+                            <el-select v-model="scope.row.newValue" placeholder="请选择">
+                                <el-option label="订阅" value="1"></el-option>
+                                <el-option label="不订阅" value="0"></el-option>
+                            </el-select>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="down" label="下载报告" align="center">
+                        <template slot-scope="scope">
+                            <el-button
+                                    size="mini"
+                                    @click="handleDown(scope.$index, scope.row)">下载</el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+
+            </el-main>
+        </el-container>
+    </el-container>
+</div>
+
+<style>
+    .el-header {
+        background-color: #B3C0D1;
+        color: #333;
+        line-height: 60px;
+    }
+
+    .el-aside {
+        /*color: #333;*/
+    }
+    .el-main {
+        height: calc(100vh - 60px);
+    }
+    .el-table{
+        max-height: fit-content;
+        /*height*/
+    }
+</style>
+
+<script src="https://cdn.bootcdn.net/ajax/libs/axios/1.2.5/axios.js"></script>
+<script src="../../js/vue.js"></script>
+<script src="../../element-ui/lib/index.js"></script>
+<link rel="stylesheet" href="../../element-ui/lib/theme-chalk/index.css">
+
+<script th:inline="javascript">
+
+    new Vue({
+        el: "#app",
+        mounted(){
+            // const _this = this;
+            // axios({
+            //     method: "get",
+            //     url: "cwe/index?currentPage="+_this.currentPage+"&pageSize="+_this.pageSize
+            // }).then(function (data) {
+            //     // _this.tableData =
+            // })
+            // alert("!!!")
+            this.select()
+        },
+        methods: {
+            select(){
+                const _this = this;
+                axios({
+                    method: "get",
+                    url: "/cwe/index?currentPage="+_this.currentPage+"&pageSize="+_this.pageSize
+                }).then(function (data) {
+                    console.log(data)
+                    _this.tableData = data.data.rows;
+                    _this.totalCount = data.data.totalCount;
+                })
+            },
+            cwe(){
+                window.location.href = '/cwe/index'
+            },
+            cveInfo(){
+                window.location.href = '/cve/index'
+            },
+            history(){
+                window.location.href = '/history/index'
+            },
+            jar(){
+                window.location.href = '/jarDetect/index'
+            },
+            spider(){
+                window.location.href = '/spider/index'
+            },
+            userManage(){
+                window.location.href = '/user/index'
+            },
+            userModify(){
+                window.location.href = '/user/userinfo'
+            },
+            loginOff(){
+                var _this = this
+                axios({
+                    method: "get",
+                    url: "/user/loginOff"
+                }).then(function (data) {
+                    console.log(data)
+                    window.location.href = '/login'
+                })
+            },
+        },
+        data() {
+            return {
+                tableData: [{
+                    name: '1',
+                    detectTime: '1',
+                    cveNum: '1',
+                    highNum: '1',
+                    value: '',
+                    noticeValue: ''
+                },{
+                    name: '1',
+                    detectTime: '1',
+                    cveNum: '1',
+                    highNum: '1',
+                    value: '',
+                    noticeValue: ''
+                }],
+                activeIndex: '2-2'
+                // noticeValue: ''
+            };
+        }
+    })
+</script>
+</body>
+</html>

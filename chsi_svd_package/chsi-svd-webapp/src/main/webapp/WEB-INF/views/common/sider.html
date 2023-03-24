@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<div id="sider" th:fragment="fragment-sider">
+    <el-aside width="200px" style="background-color: rgb(238, 241, 246); height: 100%">
+        <el-menu :default-active="activeIndex" style="background-color: rgb(238, 241, 246); ">
+            <el-submenu index="1">
+                <template slot="title"><i class="el-icon-message"></i>漏洞信息</template>
+                <el-menu-item index="1-1" @click="cveInfo">图表展示</el-menu-item>
+                <el-menu-item index="1-2" @click="cwe">漏洞类型</el-menu-item>
+            </el-submenu>
+            <el-submenu index="2">
+                <template slot="title"><i class="el-icon-menu"></i>项目检测</template>
+                <el-menu-item index="2-1" @click="detect">项目检测</el-menu-item>
+                <el-menu-item index="2-2" @click="history">历史检测记录</el-menu-item>
+            </el-submenu>
+            <el-menu-item index="3" @click="jar"><i class="el-icon-eleme"></i>jar包检测
+                <!-- <template slot="title"><i class="el-icon-setting"></i>jar包检测</template> -->
+            </el-menu-item>
+            <el-menu-item index="4" @click="spider">
+                <template slot="title"><i class="el-icon-circle-plus-outline"></i>爬取新库</template>
+            </el-menu-item>
+            <el-menu-item index="5" th:unless="${#httpSession.getAttribute('loginUser').getRole()} == 1" @click="userManage">
+                <template slot="title"><i class="el-icon-s-help"></i>用户管理</template>
+            </el-menu-item>
+        </el-menu>
+    </el-aside>
+</div>
+
+<style>
+    .el-aside {
+        /*color: #333;*/
+    }
+</style>
+
+
+<script src="https://cdn.bootcdn.net/ajax/libs/axios/1.2.5/axios.js"></script>
+<script src="../../../js/vue.js"></script>
+<script src="../../../element-ui/lib/index.js"></script>
+<link rel="stylesheet" href="../../element-ui/lib/theme-chalk/index.css">
+<script>
+    new Vue({
+        el: "#sider",
+        methods: {
+            cwe(){
+                window.location.href = '/cwe/index'
+            }
+        },
+        data(){
+            return{
+                activeIndex: [[${activeIndex}]]
+            }
+        }
+    })
+</script>
+</html>
